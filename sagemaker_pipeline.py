@@ -1,37 +1,30 @@
-import boto3
+# sagemaker_pipeline.py
+import sagemaker
+from sagemaker.sklearn.estimator import SKLearn
 import time
+import os
 
 AWS_REGION = 'us-east-1'
 ROLE_ARN = 'arn:aws:iam::084719916966:role/SageMakerExecutionRole'
 
-sm = boto3.client('sagemaker', region_name=AWS_REGION)
+sess = sagemaker.Session()
+timestamp = str(int(time.time()))
 
-training_job_name = 'jenkins-local-synthetic-' + str(int(time.time()))
-training_image = '683313688378.dkr.ecr.us-east-1.amazonaws.com/sklearn-training:2.0-cpu-py39-ubuntu20.04'
+# Dummy S3 output (mandatory by SageMaker, input is synthetic so ignored)
+S3_OUTPUT = f's3://dummy-bucket/output/'
 
-# Note: InputDataConfig can be empty or use File mode with no S3
-response = sm.create_training_job(
-    TrainingJobName=training_job_name,
-    AlgorithmSpecification={
-        'TrainingImage': training_image,
-        'TrainingInputMode': 'File'  # File mode reads data inside container
-    },
-    RoleArn=ROLE_ARN,
-    InputDataConfig=[],  # No S3 input
-    OutputDataConfig={
-        'S3OutputPath': f's3://dummy-output-bucket/'  # Required by SageMaker, but can be ignored
-    },
-    ResourceConfig={
-        'InstanceType': 'ml.m4.xlarge',
-        'InstanceCount': 1,
-        'VolumeSizeInGB': 5
-    },
-    StoppingCondition={
-        'MaxRuntimeInSeconds': 3600
-    },
-    HyperParameters={
-        'script': 'training.py'
-    }
+sklearn_estimator = SKLearn(
+    entry_point='training.py',       # <-- entry point script
+    role=ROLE_ARN,
+    instance_type='ml.m4.xlarge',
+    instance_count=1,
+    framework_version='2.0-1',
+    py_version='py39',
+    base_job_name=f'jenkins-synthetic-{timestamp}',
+    output_path=S3_OUTPUT,
+    sagemaker_session=sess
 )
 
-print(f"Training job {training_job_name} started successfully.")
+# Launch the training job
+sklearn_estimator.fit()  # training.py runs automatically inside SageMaker
+print("SageMaker training job started successfully!")

@@ -1,4 +1,5 @@
 # training.py
+# training.py
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 import joblib
@@ -15,11 +16,11 @@ if __name__ == "__main__":
     X = df[['feature1', 'feature2']]
     y = df['label']
 
-    # Train simple logistic regression
+    # Train a simple logistic regression model
     model = LogisticRegression()
     model.fit(X, y)
 
-    # Save the model locally
+    # Save the model (SageMaker expects it in /opt/ml/model)
     os.makedirs('/opt/ml/model', exist_ok=True)
     joblib.dump(model, '/opt/ml/model/model.joblib')
 
