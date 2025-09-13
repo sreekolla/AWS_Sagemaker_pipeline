@@ -42,6 +42,8 @@ pipeline {
             steps {
                 bat '''
                 call venv\\Scripts\\activate
+                where python
+                echo %PATH%
                 python sagemaker_pipeline.py
                 echo "Pipeline is created"
                 '''
