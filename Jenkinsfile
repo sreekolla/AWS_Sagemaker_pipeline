@@ -42,10 +42,9 @@ pipeline {
         stage('Run SageMaker Training') {
             steps {
                 bat '''
-                call venv\\Scripts\\activate
-                where python
-                echo %PATH%
-                python sagemaker_pipeline.py
+                venv\\Scripts\\python.exe -m pip install --upgrade pip
+                venv\\Scripts\\python.exe -m pip install sagemaker
+                venv\\Scripts\\python.exe sagemaker_pipeline.py
                 echo "Pipeline is created"
                 '''
             }
