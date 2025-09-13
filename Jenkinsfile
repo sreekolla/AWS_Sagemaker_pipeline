@@ -43,6 +43,7 @@ pipeline {
                 bat '''
                 venv\\Scripts\\activate
                 python sagemaker_pipeline.py
+                echo "Pipeline is created"
                 '''
             }
         }
