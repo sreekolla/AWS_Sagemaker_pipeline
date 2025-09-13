@@ -34,6 +34,7 @@ pipeline {
                 source venv/bin/activate
                 pip install --upgrade pip
                 pip install boto3 pandas scikit-learn joblib
+                pip install sagemaker boto3
                 '''
             }
         }
