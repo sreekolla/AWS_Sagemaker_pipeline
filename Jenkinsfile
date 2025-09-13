@@ -45,8 +45,9 @@ pipeline {
                 venv\\Scripts\\python.exe -m pip install --upgrade pip
                 venv\\Scripts\\python.exe -m pip install sagemaker
                 venv\\Scripts\\python.exe -m pip install --upgrade pip wheel setuptools
-                pythom -m venv venv                 
-                venv\\Scripts\\python.exe -m pip install numpy==1.26.4 scikit-learn pandas boto3 joblib sagemaker
+                python -m venv venv                 
+                venv\\Scripts\\python.exe -m pip install numpy==1.26.4
+                venv\\Scripts\\python.exe -m pip install -r requirements.txt
                 venv\\Scripts\\python.exe sagemaker_pipeline.py
                 echo "Pipeline is created"
                 '''
