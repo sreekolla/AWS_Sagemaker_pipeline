@@ -47,7 +47,7 @@ pipeline {
                 venv\\Scripts\\python.exe -m pip install --upgrade pip wheel setuptools
                 python -m venv venv                 
                 venv\\Scripts\\python.exe -m pip install numpy==1.26.4
-                venv\\Scripts\\python.exe -m pip install -r requirements.txt
+                venv\\Scripts\\python.exe -m pip install -r requirements.txt --only-binary=:all:
                 venv\\Scripts\\python.exe sagemaker_pipeline.py
                 echo "Pipeline is created"
                 '''
