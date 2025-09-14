@@ -27,29 +27,34 @@ pipeline {
         }
 
 
-        stage('Install Dependencies') {
+        stage('Setup Virtual Environment & Install Dependencies') {
             steps {
                 bat '''
                 python -m venv venv
-                source venv/bin/activate
-                pip install --upgrade pip
-                pip install boto3 pandas scikit-learn joblib
-                pip install sagemaker
+                venv\\Scripts\\python.exe -m pip install --upgrade pip wheel setuptools
+                venv\\Scripts\\python.exe -m pip cache purge
+                venv\\Scripts\\python.exe -m pip install --no-cache-dir --only-binary=:all: numpy==1.26.4
+                venv\\Scripts\\python.exe -m pip install --no-cache-dir --only-binary=:all: scikit-learn==1.5.2 boto3>=1.35.36 sagemaker==2.215.0
                 '''
             }
         }
 
-        stage('Run SageMaker Training') {
+        stage('Verify Python Environment') {
             steps {
                 bat '''
-                venv\\Scripts\\python.exe -m pip install --upgrade pip
-                venv\\Scripts\\python.exe -m pip install sagemaker
-                venv\\Scripts\\python.exe -m pip install --upgrade pip wheel setuptools
-                python -m venv venv                 
-                venv\\Scripts\\python.exe -m pip install numpy==1.26.4
-                venv\\Scripts\\python.exe -m pip install -r requirements.txt --only-binary=:all:
+                venv\\Scripts\\python.exe -c "import numpy; numpy.show_config(); print('NumPy version:', numpy.__version__)"
+                venv\\Scripts\\python.exe -c "import sklearn; print('scikit-learn version:', sklearn.__version__)"
+                venv\\Scripts\\python.exe -c "import boto3; print('boto3 version:', boto3.__version__)"
+                venv\\Scripts\\python.exe -c "import sagemaker; print('SageMaker version:', sagemaker.__version__)"
+                '''
+            }
+        }
+
+        stage('Run SageMaker Training Pipeline') {
+            steps {
+                bat '''
                 venv\\Scripts\\python.exe sagemaker_pipeline.py
-                echo "Pipeline is created"
+                echo "Pipeline is created successfully"
                 '''
             }
         }
